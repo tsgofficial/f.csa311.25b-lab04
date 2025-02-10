@@ -1,12 +1,10 @@
-# Testing Infrastructure in Java
+Энэхүү репозиторийг JUnit-ээр тест хийх, Jacoco-гоор тестийн хамрах хүрээг шалгах зорилгоор тохируулсан бөгөөд эдгээрийг Maven-ээр автоматжуулсан болно.
 
-This repository is set up for testing with _JUnit_ and test coverage with _Jacoco_, both automated through _Maven_.
+Та IDE-ээ ашиглан тест ажиллуулах, хамрах хүрээг харах интеграцийг судлахыг хүсэж магадгүй. Гэхдээ мөн тестүүдийг Maven-ээр ажиллуулж, Үргэлжилсэн Интеграцийн (CI) орчинд (жишээ нь GitHub Actions) гүйцэтгэх боломжтой.
 
-You will likely want to explore IDE integration for test execution and coverage in your IDE, but also ensure that tests still execute with Maven in a Continuous Integration environment (e.g. github actions).
+Дараах командууд хэрэг болох боломжтой:
 
-The following commands might be useful:
-* `mvn clean` reset the build
-* `mvn test` execute tests and write a test coverage report in `target/site/jacoco/index.html`
-* `mvn site` build and test the project and write results in `target/site/index.html` (includes coverage and test results)
-
-See the comments in `pom.xml` for technical details of this setup.
+mvn clean – бүтээн байгуулалтыг (build) дахин тохируулах
+mvn test – тестүүдийг ажиллуулж, target/site/jacoco/index.html файлын тестийн хамрах хүрээний тайлан үүсгэх
+mvn site – төслийг бүтээж, тестийг ажиллуулан, үр дүнг target/site/index.html файлд хадгалах (хамрах хүрээ, тестийн үр дүнг багтаасан)
+Энэхүү тохиргооны техникийн дэлгэрэнгүйг pom.xml файл дахь тайлбаруудаас үзнэ үү.
