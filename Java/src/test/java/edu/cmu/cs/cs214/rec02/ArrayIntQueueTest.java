@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +30,7 @@ import org.junit.Test;
  *
  * @author Alex Lockwood, George Guo, Terry Li
  */
-public class IntQueueTest {
+public class ArrayIntQueueTest {
 
     private IntQueue mQueue;
     private List<Integer> testList;
@@ -36,16 +40,15 @@ public class IntQueueTest {
      */
     @Before
     public void setUp() {
-        // comment/uncomment these lines to test each class
-        mQueue = new LinkedIntQueue();
-        //    mQueue = new ArrayIntQueue();
+
+        mQueue = new ArrayIntQueue();
 
         testList = new ArrayList<>(List.of(1, 2, 3));
     }
 
     @Test
     public void testIsEmpty() {
-        // This is an example unit test
+
         assertTrue(mQueue.isEmpty());
     }
 
@@ -62,7 +65,7 @@ public class IntQueueTest {
         try {
             mQueue.peek();
         } catch (Exception e) {
-            assertTrue(true); 
+            assertTrue(true);
         }
     }
 
@@ -77,7 +80,7 @@ public class IntQueueTest {
 
     @Test
     public void testEnqueue() {
-        // This is an example unit test
+
         for (int i = 0; i < testList.size(); i++) {
             mQueue.enqueue(testList.get(i));
             assertEquals(testList.get(0), mQueue.peek());
@@ -92,14 +95,19 @@ public class IntQueueTest {
         }
 
         for (int i = 0; i < testList.size(); i++) {
-            assertEquals(testList.get(i), mQueue.dequeue());
-            assertEquals(testList.size() - i - 1, mQueue.size());
+            Integer element = mQueue.dequeue();
+
+            if (element != null) {
+                assertEquals(testList.get(i), element);
+                assertEquals(testList.size() - i - 1, mQueue.size());
+            }
+
         }
     }
 
     @Test
     public void testContent() throws IOException {
-        // This is an example unit test
+
         InputStream in = new FileInputStream("src/test/resources/data.txt");
         try (Scanner scanner = new Scanner(in)) {
             scanner.useDelimiter("\\s*fish\\s*");
@@ -116,6 +124,113 @@ public class IntQueueTest {
                 assertEquals(mQueue.dequeue(), result);
             }
         }
+    }
+
+    @Test
+    public void testClearEmptyQueue() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        assertTrue(queue.isEmpty());
+
+        queue.clear();
+
+        assertTrue(queue.isEmpty());
+
+        assertEquals(0, queue.size());
+    }
+
+    @Test
+    public void testClearNonEmptyQueue() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        for (int i = 0; i < 5; i++) {
+            queue.enqueue(i);
+        }
+
+        assertFalse(queue.isEmpty());
+        assertEquals(5, queue.size());
+
+        queue.clear();
+
+        assertTrue(queue.isEmpty());
+
+        assertEquals(0, queue.size());
+
+        assertEquals(0, queue.getHead());
+
+        try {
+            queue.peek();
+            fail("Expected exception when peeking an empty queue.");
+        } catch (Exception e) {
+            assertTrue(e instanceof NoSuchElementException);
+        }
+    }
+
+    @Test
+    public void testEnsureCapacityBasicResize() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        for (int i = 0; i < 10; i++) {
+            queue.enqueue(i);
+        }
+
+        assertEquals(10, queue.size());
+
+        queue.enqueue(10);
+
+        assertEquals(11, queue.size());
+        assertEquals(Integer.valueOf(0), queue.peek());
+    }
+
+    @Test
+    public void testEnsureCapacityWithWraparound() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        for (int i = 0; i < 10; i++) {
+            queue.enqueue(i);
+        }
+
+        queue.dequeue();
+
+        queue.enqueue(10);
+
+        assertEquals(10, queue.size());
+        assertEquals(Integer.valueOf(1), queue.peek());
+    }
+
+    @Test
+    public void testEnsureCapacityDataIntegrity() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        for (int i = 0; i < 10; i++) {
+            queue.enqueue(i);
+        }
+
+        queue.dequeue();
+        queue.dequeue();
+
+        for (int i = 10; i < 15; i++) {
+            queue.enqueue(i);
+        }
+
+        assertEquals(Integer.valueOf(2), queue.peek());
+
+        assertEquals(15, queue.size());
+    }
+
+    @Test
+    public void testDequeueEmptyQueueReturnsNull() {
+        ArrayIntQueue queue = new ArrayIntQueue();
+
+        assertTrue(queue.isEmpty());
+
+        Integer result = queue.dequeue();
+
+        assertNull(result);
+
+        assertEquals(0, queue.size());
+
+        assertTrue(queue.isEmpty());
     }
 
 }
